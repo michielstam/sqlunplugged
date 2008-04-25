@@ -7,13 +7,64 @@
 
   <servlet>
     <servlet-name>SqlEditorServlet</servlet-name>
-    <servlet-class>2daba4.servlets.SqlServlet</servlet-class>
+    <servlet-class>sqlunplugged.servlets.SqlEditorServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+	<security-role-ref>
+		<role-name>user</role-name>
+		<role-link>users</role-link>
+	</security-role-ref>
   </servlet>
   
   <servlet-mapping>
     <servlet-name>SqlEditorServlet</servlet-name>
-    <url-pattern>/inloggen</url-pattern>
+    <url-pattern>/SqlEditor</url-pattern>
   </servlet-mapping>
+
+<security-constraint>
+	<web-resource-collection>
+		<web-resource-name>SqlEditorServlet</web-resource-name>
+		<url-pattern>/SqlEditor</url-pattern>
+	</web-resource-collection>
+	<auth-constraint>
+		<role-name>users</role-name>
+	</auth-constraint>
+</security-constraint>
+
+  <servlet>
+	<servlet-name>SqlInloggen</servlet-name>
+	<servlet-class>sqlunplugged.servlets.SqlInloggen</servlet-class>
+	<load-on-startup>1</load-on-startup>
+	<security-role-ref>
+		<role-name>user</role-name>
+		<role-link>users</role-link>
+	</security-role-ref>
+  </servlet>
+
+  <servlet-mapping>
+	<servlet-name>SqlInloggen</servlet-name>
+	<url-pattern>/main</url-pattern>
+  </servlet-mapping>
+  
+<security-constraint>
+	<web-resource-collection>
+		<web-resource-name>SqlInloggen</web-resource-name>
+		<url-pattern>/main</url-pattern>
+	</web-resource-collection>
+	<auth-constraint>
+		<role-name>users</role-name>
+	</auth-constraint>
+</security-constraint>
+
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <form-login-page>/main</form-login-page>
+      <form-error-page>/Error.html</form-error-page>
+    </form-login-config>
+  </login-config>
+  
+<security-role>
+	<role-name>users</role-name>
+</security-role>
 
 </web-app>
