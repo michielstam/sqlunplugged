@@ -28,6 +28,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 		{
 			HttpSession session = request.getSession();
+			/*
 			MyPrincipal mp = (MyPrincipal)request.getUserPrincipal();
 			AccountManager am = mp.getAccountManager();
 			efg.bank.AccountOffice ao = mp.getAccountOffice();
@@ -50,12 +51,14 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			AccountInfoBean aib = new AccountInfoBean(session.getId());
 			aib.populate(ao);
 			request.setAttribute("accountinfo", aib);
+			*/
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/NewAccount.jsp");
 			dispatcher.forward(request, response);
 		}
 		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 		{
 			HttpSession session = request.getSession();
+			/*
 			MyPrincipal mp = (MyPrincipal)request.getUserPrincipal();
 			efg.bank.AccountManager am = mp.getAccountManager();
 			AccountOffice ao = mp.getAccountOffice();
@@ -69,6 +72,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/NewAccount.jsp");
 				dispatcher.forward(request, response);
 			}
+			*/
 		}
 		public void destroy()
 		{
