@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policy PUBLIC "-//JBoss//DTD JBOSS Security Config 3.0//EN" "http://www.jboss.org/j2ee/dtd/security_config.dtd">
+<policy>
+	<application-policy name="SqlSecurityDomain">
+		<authentication>
+			<login-module code="sqlunplugged.jaas.SqlLoginModule" flag="required"/>
+		</authentication>
+	</application-policy>
+</policy>
