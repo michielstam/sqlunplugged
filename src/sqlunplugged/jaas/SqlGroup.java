@@ -1,6 +1,5 @@
 package sqlunplugged.jaas;
 
-//author: Remi Ham
 
 import java.security.Principal;
 import java.security.acl.Group;

@@ -1,6 +1,5 @@
 package sqlunplugged.jaas;
 
-//author: Remi Ham
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -51,7 +50,7 @@ public class SqlLoginModule implements LoginModule
 
 	public boolean login() throws LoginException
 	{
-		System.out.println("BankLoginModule.login()");
+		System.out.println("SqlLoginModule.login()");
 		boolean ret = false;
 		SqlNameCallback nc = new SqlNameCallback("User name: ", "guest");
 		SqlPasswordCallback pc = new SqlPasswordCallback("Password: ", false);
@@ -121,7 +120,7 @@ public class SqlLoginModule implements LoginModule
 	
 	public boolean commit()	throws LoginException
 	{
-		System.out.println("BankLoginModule.commit()");
+		System.out.println("SqlLoginModule.commit()");
 		boolean ret = false;
 		if (succeeded)
 		{
@@ -137,7 +136,7 @@ public class SqlLoginModule implements LoginModule
 
 	public boolean abort() throws LoginException
 	{
-		System.out.println("BankLoginModule.abort()");
+		System.out.println("SqlLoginModule.abort()");
 		boolean ret = true;
 		succeeded = false;
 		if (commitSucceeded)
@@ -150,7 +149,7 @@ public class SqlLoginModule implements LoginModule
 
 	public boolean logout()	throws LoginException
 	{
-		System.out.println("BankLoginModule.logout()");
+		System.out.println("SqlLoginModule.logout()");
 		return principals.remove(principal) && principals.remove(roles) && principals.remove(callerPrincipal);
 	}
 }
