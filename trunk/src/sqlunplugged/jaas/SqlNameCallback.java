@@ -1,6 +1,5 @@
 package sqlunplugged.jaas;
 
-//author: Remi Ham
 
 import javax.security.auth.callback.NameCallback;
 
