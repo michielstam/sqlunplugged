@@ -27,14 +27,14 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		{
 			System.out.println("(" + id + ")SqlEditorServlet.init()");
 		}
-		/*
-		public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-		{
-			HttpSession session = request.getSession();
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlInloggen.jsp");
-			dispatcher.forward(request, response);
-		}
-		*/
+		
+//		public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+//		{
+//			HttpSession session = request.getSession();
+//			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
+//			dispatcher.forward(request, response);
+//		}
+		
 		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 		{
 			SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
