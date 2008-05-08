@@ -87,23 +87,10 @@ public class SqlLoginModule implements LoginModule
 	    try {
 	    	Class.forName("oracle.jdbc.driver.OracleDriver");
 	    	con = DriverManager.getConnection("jdbc:oracle:thin:"+username+"/"+password+"@145.89.193.70:1521:cursus1");
-
-	    	//TODO hier je eigen onnectie naar je local mysql database maken of remote natuurlijk
-	    	/*
-	    	Class.forName("com.mysql.jdbc.Driver").newInstance();
-	    	con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql",username,password);*/
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} /*
-		catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} */
+		}
 		catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		
