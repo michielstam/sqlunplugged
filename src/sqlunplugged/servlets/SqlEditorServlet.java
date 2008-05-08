@@ -19,60 +19,26 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		private long id = nextID();
 		public SqlEditorServlet()
 		{
-			System.out.println("NewAccount.NewAccount()");
+			System.out.println("SqlEditorServlet()");
 		}
 		public void init() throws ServletException
 		{
-			System.out.println("(" + id + ")NewAccountControl.init()");
+			System.out.println("(" + id + ")SqlEditorServlet.init()");
 		}
+		/*
 		public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 		{
 			HttpSession session = request.getSession();
-			/*
-			MyPrincipal mp = (MyPrincipal)request.getUserPrincipal();
-			AccountManager am = mp.getAccountManager();
-			efg.bank.AccountOffice ao = mp.getAccountOffice();
-			NewAccountBean nab = new NewAccountBean(session.getId());
-			nab.populate(request);
-			if (nab.validate())
-			{
-				try
-				{
-					String newAccount = am.newAccount(Double.parseDouble(nab.getLimiet()), nab.getNaam(), nab.getPincode());
-					nab.setRekNr(newAccount);
-					System.out.println("Nieuwe reknr :" + newAccount);
-				}
-				catch (Exception e)
-				{
-					System.out.println(e);
-				}
-			}
-			request.setAttribute("key", nab);
-			AccountInfoBean aib = new AccountInfoBean(session.getId());
-			aib.populate(ao);
-			request.setAttribute("accountinfo", aib);
-			*/
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/NewAccount.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlInloggen.jsp");
 			dispatcher.forward(request, response);
 		}
+		*/
 		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 		{
 			HttpSession session = request.getSession();
-			/*
-			MyPrincipal mp = (MyPrincipal)request.getUserPrincipal();
-			efg.bank.AccountManager am = mp.getAccountManager();
-			AccountOffice ao = mp.getAccountOffice();
-			if (am != null)
-			{
-				NewAccountBean nab = new NewAccountBean(session.getId());
-				request.setAttribute("key", nab);
-				AccountInfoBean aib = new AccountInfoBean(session.getId());
-				aib.populate(ao);
-				request.setAttribute("accountinfo", aib);
-				RequestDispatcher dispatcher = request.getRequestDispatcher("/NewAccount.jsp");
-				dispatcher.forward(request, response);
-			}
-			*/
+			System.out.println("(" + id + ")SqlEditorServlet.doGet()");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/Login.jsp");
+			dispatcher.forward(request, response);
 		}
 		public void destroy()
 		{

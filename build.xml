@@ -1,9 +1,9 @@
-<project name="2daba4" basedir="." default="war" >
+<project name="sqlunplugged" basedir="." default="war" >
 
   <property environment="env"/>
   <property name="jboss.home"   value="${env.JBOSS_HOME}"/>
   <property name="jboss.server" value="${jboss.home}/server/default"/>
-  <property name="jboss.deploy" value="${jboss.server}/deploy/2daba4"/>
+  <property name="jboss.deploy" value="${jboss.server}/deploy/sqluplugged"/>
   <property name="application"  value="${ant.project.name}.war"/>
 
   <path id="j2ee">
