@@ -37,7 +37,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		{
 			HttpSession session = request.getSession();
 			System.out.println("(" + id + ")SqlEditorServlet.doGet()");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/Login.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 			dispatcher.forward(request, response);
 		}
 		public void destroy()
