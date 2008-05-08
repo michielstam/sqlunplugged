@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import sqlunplugged.jaas.SqlPrincipal;
 import javax.servlet.ServletException;
+import java.sql.Connection;
 
 public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		static final long serialVersionUID = 0L; 
@@ -35,7 +37,8 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		*/
 		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 		{
-			HttpSession session = request.getSession();
+			SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
+			Connection con = sp.getConnection();
 			System.out.println("(" + id + ")SqlEditorServlet.doGet()");
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 			dispatcher.forward(request, response);
