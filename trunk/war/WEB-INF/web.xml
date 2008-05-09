@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app 
+<web-app
   xmlns="http://java.sun.com/xml/ns/javaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
@@ -14,12 +14,12 @@
 		<role-link>users</role-link>
 	</security-role-ref>
   </servlet>
-  
+
   <servlet-mapping>
     <servlet-name>SqlEditorServlet</servlet-name>
     <url-pattern>/main</url-pattern>
   </servlet-mapping>
-  
+
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>main</web-resource-name>
@@ -37,7 +37,7 @@
       <form-error-page>/Error.html</form-error-page>
     </form-login-config>
   </login-config>
-  
+
 <security-role>
 	<role-name>users</role-name>
 </security-role>

@@ -62,7 +62,7 @@ public class SqlGroup extends SqlPrincipal implements Group
 			if (o instanceof SqlGroup)
 			{
 				SqlGroup other = (SqlGroup)o;
-				if (name.equals(other.name))
+				if (username.equals(other.username))
 				{
 					if (members.equals(other.members))
 					{

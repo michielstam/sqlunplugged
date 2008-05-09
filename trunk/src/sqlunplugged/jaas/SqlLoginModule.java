@@ -84,6 +84,12 @@ public class SqlLoginModule implements LoginModule
 
 		
 		Connection con = null;
+		
+    	/*Dit is om een connectie met een mysql database te maken (niet weer delete michiel (-_-))
+    	
+    	Class.forName("com.mysql.jdbc.Driver").newInstance();
+    	con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql",username,password);
+    	*/
 	    try {
 	    	Class.forName("oracle.jdbc.driver.OracleDriver");
 	    	con = DriverManager.getConnection("jdbc:oracle:thin:"+username+"/"+password+"@145.89.193.70:1521:cursus1");
@@ -94,15 +100,20 @@ public class SqlLoginModule implements LoginModule
 			e.printStackTrace();
 		} 
 		
-		//start problem
+		//start problem ik check hier of connectie gelukt is ik neem aan dat je wachtwoord en username dan juis is daarna sluit ik hem weer omdat je de connectie niet open mag laten
 		if(con != null)
 		{
 			roles = new SqlGroup("Roles");
 			roles.addMember(new SqlPrincipal("users"));
 			callerPrincipal = new SqlGroup("CallerPrincipal");
-			callerPrincipal.addMember(new SqlPrincipal(username, con));
+			callerPrincipal.addMember(new SqlPrincipal(username, password));
 			ret = succeeded = true;
 			System.out.println("AccountManager True");
+			try {
+				con.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 			return ret;
 	
 			

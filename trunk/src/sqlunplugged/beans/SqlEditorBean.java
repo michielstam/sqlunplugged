@@ -6,4 +6,12 @@ public class SqlEditorBean{
 	public SqlEditorBean()
 	{
 	}
+	public void setQuery(String query)
+	{
+		this.query = query;
+	}
+	public String getQuery()
+	{
+		return query;
+	}
 }
