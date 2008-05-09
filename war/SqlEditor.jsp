@@ -9,10 +9,10 @@
 Please enter your SQL statement:
 <!-- Include HTML Form with textarea element -->
 <form method=post>
-<textarea name=sql cols=40 rows=4>
+<textarea name="query" cols=40 rows=4 >
 </textarea>
 <br>
-<input type=submit>
+<input type="submit" value="OK">
 </form>
 <hr>
 
