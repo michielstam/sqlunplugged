@@ -3,8 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mysql-connector-java-5.1.6-bin.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/ojdbc6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/J2EE"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/eclipse/plugins/javax.servlet.jsp_2.0.0.v200706191603.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
