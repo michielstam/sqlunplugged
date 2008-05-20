@@ -52,16 +52,25 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		{
 			System.out.println("(" + id + ")SqlEditorServlet.doPost()");
 			HttpSession session = request.getSession();
-			seb = new SqlEditorBean();
-			SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
-			Connection con = sp.getConnection();
-			//query wordt uitgevoerd; returned een boolean ter controle van goede uitvoer
-			ExecuteQuery(con, request.getParameter("query"));
+						
+			if(request.getParameter("logout") != null)
+			{
+				session.invalidate();
+				seb = null;
+				response.sendRedirect("main");
+			}
 			
-			seb.setQuery(request.getParameter("query"));
-			session.setAttribute("bean", seb);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
+			else if(request.getParameter("execute") != null)
+			{
+				SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
+				Connection con = sp.getConnection();
+				//query wordt uitgevoerd; returned een boolean ter controle van goede uitvoer
+				ExecuteQuery(con, request.getParameter("query"));
+				seb.setQuery(request.getParameter("query"));
+				session.setAttribute("bean", seb);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
+				dispatcher.forward(request, response);
+			}
 		}
 		
 		public void destroy()
@@ -77,10 +86,11 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			
 			int columnLength = 0;
 			
+			//query is leeg
 			if (sql==null || sql.equals(""))
 				seb.setStatus("Error: no query entered");
 
-			//vraag het statement op
+			//vraag het sql-statement op
 			Statement query = null;
 			try
 				{query = con.createStatement();}
@@ -92,10 +102,12 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			}
 			
 			
-			//als de statement een SELECT query is...
+			//SELECT
 			if (sql.trim().toUpperCase().startsWith("SELECT"))
 			{
 				System.out.println("SQL-query is een SELECT-statement");
+				
+				//opslag
 				ArrayList<String[]> queryResultsHeaders = new ArrayList<String[]>();
 				ArrayList<String[]> queryResultsData = new ArrayList<String[]>();
 				ResultSet resultSet = null;
@@ -114,7 +126,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			        String[] headers = new String[columnLength+1];
 			        for (int i=1; i<=columnLength; i++)
 		        	{
-		        		System.out.println(resultMetaData.getColumnName(i));
+		        		System.out.println("Column name: " + resultMetaData.getColumnName(i));
 		        		headers[i] = resultMetaData.getColumnName(i);
 		        	}
 			        queryResultsHeaders.add(headers);
@@ -126,13 +138,13 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			        	String[] data = new String[columnLength+1];
 			        	for (int i=1; i<=columnLength; i++)
 			        	{
-			        		System.out.println(resultSet.getString(i));
+			        		System.out.println("Recordattribuut: "+resultSet.getString(i));
 			        		data[i] = encodeHtmlTag(resultSet.getString(i));
 			        	}
 			        	queryResultsData.add(data);
 			        }
 			        seb.setQueryResultData(queryResultsData);
-			        seb.setStatus("SELECT successful executed");
+			        seb.setStatus(""+queryResultsData.size()+" Items selected");
 			        resultSet.close();
 			        con.close();
 				}
@@ -144,55 +156,36 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				}
 			}
 			
-			//query is geen SELECT maar een 'DO' query, schrijf feedback van oracle in header bean
-			else if(sql.trim().toUpperCase().startsWith("UPDATE"))
+			//Query anders dan SELECT
+			else
 			{
 				try
 				{
 					//to do - standard message forwarden
 					int i = query.executeUpdate(sql);
-					seb.setStatus("" + i + " row(s) affected");
-					con.close();
-				}
-				
-				catch(SQLException e)
-				{
-					System.out.println("SQL error: " + e);
-					seb.setStatus("Error: " + e.getMessage());
-				}
-			}
-			
-			
-			//NOG AANPASSEN
-			else if(sql.trim().toUpperCase().startsWith("CREATE"))
-			{
-				try
-				{
-					//to do - standard message forwarden
-					boolean succeeded = query.execute(sql);
-					if(succeeded)
-						seb.setStatus("CREATE successful executed");
-
-					con.close();
-				}
-				
-				catch(SQLException e)
-				{
-					System.out.println("Error: " + e);
-					seb.setStatus("Error: " + e.getMessage());
-				}
-			}
-			
-			else if(sql.trim().toUpperCase().startsWith("DROP"))
-			{
-				try
-				{
-					//to do - standard message forwarden
-					boolean succeeded = query.execute(sql);
-					if(succeeded)
-						seb.setStatus("DROP successful executed");
-
-					con.close();
+					
+					if(	sql.trim().toUpperCase().startsWith("INSERT") ||
+						sql.trim().toUpperCase().startsWith("UPDATE") ||
+						sql.trim().toUpperCase().startsWith("DELETE"))
+					{	
+						seb.setStatus("" + i + " Row(s) affected");
+						con.close();
+					}
+					
+					else if(
+						sql.trim().toUpperCase().startsWith("CREATE") ||
+						sql.trim().toUpperCase().startsWith("ALTER") ||
+						sql.trim().toUpperCase().startsWith("DROP"))
+					{
+						seb.setStatus("Query successful executed");
+						con.close();						
+					}
+					
+					else
+					{
+						seb.setStatus("Query successful executed");
+						con.close();
+					}
 				}
 				
 				catch(SQLException e)
