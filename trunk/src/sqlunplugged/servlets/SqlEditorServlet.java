@@ -60,6 +60,14 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				response.sendRedirect("main");
 			}
 			
+			else if(request.getParameter("reset") != null)
+			{
+				seb = new SqlEditorBean();
+				session.setAttribute("bean", seb);
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
+				dispatcher.forward(request, response);
+			}
+			
 			else if(request.getParameter("execute") != null)
 			{
 				SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();

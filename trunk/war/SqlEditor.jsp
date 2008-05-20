@@ -13,13 +13,13 @@
 			Please enter your SQL statement:
 			<br />
 			<br />
-			<form method="post">
+			<form name="form1" method="post">
 				<textarea name="query" cols="40" rows="4">${bean.query}</textarea>
 				<br />
 				${bean.status}
 				<br />
 				<br />
-				<input type="submit" name="execute" value="OK" /><input type="reset" name="reset" value="Clear" /><input type="submit" name="logout" value="Logout" />
+				<input type="submit" name="execute" value="OK"><input name="reset" type="submit" value="Clear"><input type="submit" name="logout" value="Logout">
 			</form>
 			<br />
 			<hr />
