@@ -29,22 +29,17 @@
       <role-name>users</role-name>
     </auth-constraint>
   </security-constraint>
+	
+	  <login-config>
+	    <auth-method>FORM</auth-method>
+	    <form-login-config>
+	      <form-login-page>/Login.jsp</form-login-page>
+	      <form-error-page>/Error.html</form-error-page>
+	    </form-login-config>
+	  </login-config>
 
-  <login-config>
-    <auth-method>FORM</auth-method>
-    <form-login-config>
-      <form-login-page>/Login.jsp</form-login-page>
-      <form-error-page>/Error.html</form-error-page>
-    </form-login-config>
-  </login-config>
-
-<security-role>
-	<role-name>users</role-name>
-</security-role>
-
-	<taglib>
-	  	<taglib-uri>/Taglib</taglib-uri>
-	  	<taglib-location>/WEB-INF/taglib.tld</taglib-location>
-  	</taglib>
+	<security-role>
+		<role-name>users</role-name>
+	</security-role>
 
 </web-app>

@@ -8,10 +8,11 @@ public class SqlEditorBean
 {
 	//attributes
 	private String 				query 				= "";
+	private String				status				= "Status: connected";
 	private int					columnLength		= 0;
 	private ArrayList<String[]> queryResultHeaders	= new ArrayList<String[]>();
 	private ArrayList<String[]> queryResultData		= new ArrayList<String[]>();
-	
+		
 	//constructor
 	public SqlEditorBean(){}
 	
@@ -42,4 +43,12 @@ public class SqlEditorBean
 
 	public ArrayList<String[]> getQueryResultData()
 		{return queryResultData;}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String newStatus) {
+		status = newStatus;
+	}
 }

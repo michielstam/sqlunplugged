@@ -21,7 +21,6 @@ import sqlunplugged.jaas.SqlPrincipal;
 public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		static final long serialVersionUID = 0L; 
 		private static long ID = 0L;
-		private String sqlErrorMessage = "";
 		private SqlEditorBean seb = null;
 		private static synchronized long nextID()
 		{
@@ -42,6 +41,9 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		{
 			System.out.println("(" + id + ")SqlEditorServlet.doGet()");
 			HttpSession session = request.getSession();
+			seb = new SqlEditorBean();
+			seb.setQuery("SELECT * FROM klant");
+			session.setAttribute("bean", seb);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -54,29 +56,10 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
 			Connection con = sp.getConnection();
 			//query wordt uitgevoerd; returned een boolean ter controle van goede uitvoer
-			boolean querySuccessfulExecuted = getQueryResults(con, request.getParameter("query"));
-			
-			if(querySuccessfulExecuted)
-			{
-				System.out.println(seb.getQueryResultData());
-			}
-			
-			if(!querySuccessfulExecuted)
-			{
-				String[] sqlErrorMessageAsArray = new String[1];
-				sqlErrorMessageAsArray[0] = sqlErrorMessage;
-				ArrayList<String[]> arraylist = new ArrayList<String[]>();
-				arraylist.add(sqlErrorMessageAsArray);
-				seb.setQueryResultData(arraylist);
-			}
+			ExecuteQuery(con, request.getParameter("query"));
 			
 			seb.setQuery(request.getParameter("query"));
-			
-			session.setAttribute("key", seb);
-			//altijd connectie sluiten nadat je gedaan hebt wat je wilt 
-			//doen als je sp.getConnection(); aanroept maakt ie automatisch 
-			//nieuwe connectie voor je aan
-			
+			session.setAttribute("bean", seb);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -86,7 +69,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			System.out.println("(" + id + ")SqlEditorServlet.destroy()");
 		}
 		
-		public boolean getQueryResults(Connection con, String sql)
+		public void ExecuteQuery(Connection con, String sql)
 		{
 			System.out.println("(" + id + ")SqlEditorServlet.getQuertResult()");
 			System.out.println(con);
@@ -95,7 +78,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			int columnLength = 0;
 			
 			if (sql==null || sql.equals(""))
-				return false;
+				seb.setStatus("Error: no query entered");
 
 			//vraag het statement op
 			Statement query = null;
@@ -104,8 +87,8 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			
 			catch(SQLException e)
 			{
-				sqlErrorMessage = e.getMessage();
-				return false;
+				System.out.println(e);
+				seb.setStatus("Error: " + e.getMessage());
 			}
 			
 			
@@ -149,6 +132,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			        	queryResultsData.add(data);
 			        }
 			        seb.setQueryResultData(queryResultsData);
+			        seb.setStatus("SELECT successful executed");
 			        resultSet.close();
 			        con.close();
 				}
@@ -156,30 +140,67 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				catch(SQLException e)
 				{
 					System.out.println("SQL error: " + e);
-					sqlErrorMessage = e.getMessage();
-					return false;
+					seb.setStatus("Error: " + e.getMessage());
 				}
 			}
 			
 			//query is geen SELECT maar een 'DO' query, schrijf feedback van oracle in header bean
-			else
+			else if(sql.trim().toUpperCase().startsWith("UPDATE"))
 			{
 				try
 				{
 					//to do - standard message forwarden
 					int i = query.executeUpdate(sql);
+					seb.setStatus("" + i + " row(s) affected");
 					con.close();
 				}
 				
 				catch(SQLException e)
 				{
-					sqlErrorMessage = e.getMessage();
-					return false;
+					System.out.println("SQL error: " + e);
+					seb.setStatus("Error: " + e.getMessage());
 				}
 			}
 			
-	        //close connections
-	        return true;
+			
+			//NOG AANPASSEN
+			else if(sql.trim().toUpperCase().startsWith("CREATE"))
+			{
+				try
+				{
+					//to do - standard message forwarden
+					boolean succeeded = query.execute(sql);
+					if(succeeded)
+						seb.setStatus("CREATE successful executed");
+
+					con.close();
+				}
+				
+				catch(SQLException e)
+				{
+					System.out.println("Error: " + e);
+					seb.setStatus("Error: " + e.getMessage());
+				}
+			}
+			
+			else if(sql.trim().toUpperCase().startsWith("DROP"))
+			{
+				try
+				{
+					//to do - standard message forwarden
+					boolean succeeded = query.execute(sql);
+					if(succeeded)
+						seb.setStatus("DROP successful executed");
+
+					con.close();
+				}
+				
+				catch(SQLException e)
+				{
+					System.out.println("SQL error: " + e);
+					seb.setStatus("Error: " + e.getMessage());
+				}
+			}
 		}
 
 		//encode htmltag, special characters
