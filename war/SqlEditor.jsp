@@ -19,7 +19,7 @@
 				${bean.status}
 				<br />
 				<br />
-				<input type="submit" value="OK" />
+				<input type="submit" name="execute" value="OK" /><input type="reset" name="reset" value="Clear" /><input type="submit" name="logout" value="Logout" />
 			</form>
 			<br />
 			<hr />
