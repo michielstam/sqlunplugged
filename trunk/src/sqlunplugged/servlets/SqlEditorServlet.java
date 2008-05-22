@@ -62,7 +62,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			
 			else if(request.getParameter("reset") != null)
 			{
-				seb = new SqlEditorBean();
+				seb.setQuery("");
 				session.setAttribute("bean", seb);
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 				dispatcher.forward(request, response);
@@ -106,6 +106,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			catch(SQLException e)
 			{
 				System.out.println(e);
+				
 				seb.setStatus("Error: " + e.getMessage());
 			}
 			

@@ -8,7 +8,7 @@ public class SqlEditorBean
 {
 	//attributes
 	private String 				query 				= "";
-	private String				status				= "Connected";
+	private String				status				= "";
 	private int					columnLength		= 0;
 	private ArrayList<String[]> queryResultHeaders	= new ArrayList<String[]>();
 	private ArrayList<String[]> queryResultData		= new ArrayList<String[]>();
