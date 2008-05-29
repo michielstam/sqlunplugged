@@ -15,14 +15,15 @@
 			<br />
 			<form name="form1" method="post">
 				<textarea name="query" cols="40" rows="4">${bean.query}</textarea>
-				<br />
-				${bean.status}
+				
 				<br />
 				<br />
 				<input type="submit" name="execute" value="OK"><input name="reset" type="submit" value="Clear"><input type="submit" name="logout" value="Logout">
 			</form>
 			<br />
+				${bean.status}
 			<hr />
+			<br />
 			<br />
 			<table border="1">	
 				<c:forEach var="item" items="${bean.queryResultHeaders}">
