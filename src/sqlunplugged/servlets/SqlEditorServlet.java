@@ -1,5 +1,8 @@
 package sqlunplugged.servlets;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,7 +45,6 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			System.out.println("(" + id + ")SqlEditorServlet.doGet()");
 			HttpSession session = request.getSession();
 			seb = new SqlEditorBean();
-			seb.setQuery("SELECT * FROM klant");
 			session.setAttribute("bean", seb);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 			dispatcher.forward(request, response);
@@ -73,25 +75,96 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
 				Connection con = sp.getConnection();
 				//query wordt uitgevoerd; returned een boolean ter controle van goede uitvoer
-				ExecuteQuery(con, request.getParameter("query"));
-				seb.setQuery(request.getParameter("query"));
+				String query = request.getParameter("query");
+				if(query.startsWith("start "))
+				{
+					start(con,query);
+					try {
+						con.close();
+					} 
+					catch (SQLException e) 
+					{
+						e.printStackTrace();
+					}
+				}
+				else
+				{
+					try {
+						ExecuteQuery(con, query);
+						con.close();
+					} catch (SQLException e) 
+					{
+						System.out.println("SQL error: " + e);
+						seb.setStatus("Error: " + e.getMessage());
+					}
+				}
+				seb.setQuery(query);
 				session.setAttribute("bean", seb);
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
 				dispatcher.forward(request, response);
 			}
 		}
 		
+		private void start(Connection con,String command) {
+			File file = new File(command.substring(6));
+			
+			if(file==null)
+			{
+				seb.setStatus("Error: File does not exists") ;
+				return;
+			}
+			try 
+			{
+		        BufferedReader in = new BufferedReader(new FileReader(file.getAbsolutePath()));
+		        String str;
+		        String query = "";
+		        String status = "";
+		        boolean queryIsStarted = false;
+		        while ((str = in.readLine()) != null) 
+		        {
+		        	if(!queryIsStarted)
+		        		if(str.trim().toUpperCase().startsWith("CREATE") || str.trim().toUpperCase().startsWith("ALTER") ||str.trim().toUpperCase().startsWith("DROP") || str.trim().toUpperCase().startsWith("INSERT") || str.trim().toUpperCase().startsWith("UPDATE") || str.trim().toUpperCase().startsWith("DELETE"))
+		        			queryIsStarted = true;
+		        	
+		        	if(queryIsStarted)
+		        		query += str;
+		        	if(str.endsWith(";")&&queryIsStarted)
+		        	{
+		        		queryIsStarted = false;
+		        		status += "<hr /><br />" + query;
+		        		try 
+		        		{
+							status += "<br />" + ExecuteQuery(con, query.trim().substring(0, query.trim().length()-1));
+						} 
+		        		catch (SQLException e) 
+						{
+							System.out.println("Error: " + e);
+							status += "<br />" + "Error: " + e.getMessage();
+						}
+		        		query = "";
+		        	}
+		        	
+		        }
+		        in.close();
+		        seb.setStatus(status);
+		    } catch (IOException e) {
+				seb.setStatus("Error: File does not exists") ;
+		    	
+		    }
+		}
+			
+		
 		public void destroy()
 		{
 			System.out.println("(" + id + ")SqlEditorServlet.destroy()");
 		}
 		
-		public void ExecuteQuery(Connection con, String sql)
+		public String ExecuteQuery(Connection con, String sql) throws SQLException
 		{
 			System.out.println("(" + id + ")SqlEditorServlet.getQuertResult()");
 			System.out.println(con);
 			System.out.println("SQL-query: "+sql);
-			
+			String ret = "";
 			int columnLength = 0;
 			
 			//query is leeg
@@ -100,17 +173,9 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 
 			//vraag het sql-statement op
 			Statement query = null;
-			try
-				{query = con.createStatement();}
+			query = con.createStatement();
 			
-			catch(SQLException e)
-			{
-				System.out.println(e);
-				
-				seb.setStatus("Error: " + e.getMessage());
-			}
-			
-			
+						
 			//SELECT
 			if (sql.trim().toUpperCase().startsWith("SELECT"))
 			{
@@ -122,87 +187,60 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				ResultSet resultSet = null;
 				
 				//execute query
-				try
-				{	
-					resultSet = query.executeQuery(sql);
-					ResultSetMetaData resultMetaData = resultSet.getMetaData();
-			        columnLength = resultMetaData.getColumnCount();
-			        
-			        //write columnLength to bean for dynamic table in jsp
-			        seb.setColumnLength(columnLength);
-			        
-			        //write headers to header arraylist
-			        String[] headers = new String[columnLength+1];
-			        for (int i=1; i<=columnLength; i++)
+					
+				resultSet = query.executeQuery(sql);
+				ResultSetMetaData resultMetaData = resultSet.getMetaData();
+		        columnLength = resultMetaData.getColumnCount();
+		        
+		        //write columnLength to bean for dynamic table in jsp
+		        seb.setColumnLength(columnLength);
+		        
+		        //write headers to header arraylist
+		        String[] headers = new String[columnLength+1];
+		        for (int i=1; i<=columnLength; i++)
+	        	{
+	        		System.out.println("Column name: " + resultMetaData.getColumnName(i));
+	        		headers[i] = resultMetaData.getColumnName(i);
+	        	}
+		        queryResultsHeaders.add(headers);
+		        seb.setQueryResultHeaders(queryResultsHeaders);
+		        
+		        //write results to data arraylist
+		        while (resultSet.next())
+		        {
+		        	String[] data = new String[columnLength+1];
+		        	for (int i=1; i<=columnLength; i++)
 		        	{
-		        		System.out.println("Column name: " + resultMetaData.getColumnName(i));
-		        		headers[i] = resultMetaData.getColumnName(i);
+		        		System.out.println("Recordattribuut: "+resultSet.getString(i));
+		        		data[i] = encodeHtmlTag(resultSet.getString(i));
 		        	}
-			        queryResultsHeaders.add(headers);
-			        seb.setQueryResultHeaders(queryResultsHeaders);
-			        
-			        //write results to data arraylist
-			        while (resultSet.next())
-			        {
-			        	String[] data = new String[columnLength+1];
-			        	for (int i=1; i<=columnLength; i++)
-			        	{
-			        		System.out.println("Recordattribuut: "+resultSet.getString(i));
-			        		data[i] = encodeHtmlTag(resultSet.getString(i));
-			        	}
-			        	queryResultsData.add(data);
-			        }
-			        seb.setQueryResultData(queryResultsData);
-			        seb.setStatus(""+queryResultsData.size()+" Items selected");
-			        resultSet.close();
-			        con.close();
-				}
+		        	queryResultsData.add(data);
+		        }
+		        seb.setQueryResultData(queryResultsData);
+		        ret = queryResultsData.size()+" Items selected";
+		        resultSet.close();				
 				
-				catch(SQLException e)
-				{
-					System.out.println("SQL error: " + e);
-					seb.setStatus("Error: " + e.getMessage());
-				}
 			}
 			
 			//Query anders dan SELECT
 			else
 			{
-				try
-				{
-					//to do - standard message forwarden
-					int i = query.executeUpdate(sql);
-					
-					if(	sql.trim().toUpperCase().startsWith("INSERT") ||
-						sql.trim().toUpperCase().startsWith("UPDATE") ||
-						sql.trim().toUpperCase().startsWith("DELETE"))
-					{	
-						seb.setStatus("" + i + " Row(s) affected");
-						con.close();
-					}
-					
-					else if(
-						sql.trim().toUpperCase().startsWith("CREATE") ||
-						sql.trim().toUpperCase().startsWith("ALTER") ||
-						sql.trim().toUpperCase().startsWith("DROP"))
-					{
-						seb.setStatus("Query successful executed");
-						con.close();						
-					}
-					
-					else
-					{
-						seb.setStatus("Query successful executed");
-						con.close();
-					}
-				}
 				
-				catch(SQLException e)
-				{
-					System.out.println("SQL error: " + e);
-					seb.setStatus("Error: " + e.getMessage());
-				}
+				//to do - standard message forwarden
+				int i = query.executeUpdate(sql);
+				
+				if(	sql.trim().toUpperCase().startsWith("INSERT") || sql.trim().toUpperCase().startsWith("UPDATE") || sql.trim().toUpperCase().startsWith("DELETE"))
+					ret = i + " Row(s) affected";
+				
+				
+				else if(sql.trim().toUpperCase().startsWith("CREATE") || sql.trim().toUpperCase().startsWith("ALTER") || sql.trim().toUpperCase().startsWith("DROP"))
+					ret = "Query successful executed";
+				
+				else
+					ret = "Query successful executed";
+				
 			}
+			return ret;
 		}
 
 		//encode htmltag, special characters
