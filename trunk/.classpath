@@ -7,5 +7,11 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jsp-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/J2EE"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/cos.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/fileupload.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/jstl.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/standard.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/struts.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/uploadbean.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
