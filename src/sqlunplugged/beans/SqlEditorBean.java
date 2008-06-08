@@ -1,14 +1,16 @@
 package sqlunplugged.beans;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 
-public class SqlEditorBean
+import javazoom.upload.UploadBean;
+
+public class SqlEditorBean extends UploadBean
 {
 	//attributes
 	private String 				query 				= "";
 	private String				status				= "";
+	private String				fileStatus			= "";
+	private ArrayList<String>   uploadedFiles 		= new ArrayList<String>();
 	private int					columnLength		= 0;
 	private ArrayList<String[]> queryResultHeaders	= new ArrayList<String[]>();
 	private ArrayList<String[]> queryResultData		= new ArrayList<String[]>();
@@ -50,5 +52,21 @@ public class SqlEditorBean
 
 	public void setStatus(String newStatus) {
 		status = newStatus;
+	}
+
+	public String getFileStatus() {
+		return fileStatus;
+	}
+
+	public void setFileStatus(String fileStatus) {
+		this.fileStatus = fileStatus;
+	}
+
+	public ArrayList<String> getUploadedFiles() {
+		return uploadedFiles;
+	}
+
+	public void setUploadedFiles(ArrayList<String> newUploadedFiles) {
+		uploadedFiles = newUploadedFiles;
 	}
 }

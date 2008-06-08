@@ -35,7 +35,7 @@
 						                      <TABLE>
 						                        <TR>
 						                          <TD>
-						                             Username
+						                             Username:
 						                          </TD>
 						                          <TD>
 						                            <INPUT TYPE="TEXT" NAME="j_username" SIZE="48">
@@ -43,7 +43,7 @@
 						                        </TR>
 						                        <TR>
 						                          <TD>
-						                            Password
+						                            Password:
 						                          </TD>
 						                          <TD>
 						                            <INPUT TYPE="PASSWORD" NAME="j_password" SIZE="48">
