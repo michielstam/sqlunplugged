@@ -203,7 +203,6 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			for(String file : folder.list())
 				storedFiles.add(file);
 			seb.setUploadedFiles(storedFiles);
-			seb.setFileStatus("File "+ request.getParameter("selected_file") +" has been succesfully executed");
 			session.setAttribute("bean", seb);
 			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
@@ -238,11 +237,15 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 	        String query = "";
 	        String status = "";
 	        boolean queryIsStarted = false;
+	        boolean containingAtLeastOneQuery = false;
 	        while ((str = in.readLine()) != null) 
 	        {
 	        	if(!queryIsStarted)
 	        		if(str.trim().toUpperCase().startsWith("CREATE") || str.trim().toUpperCase().startsWith("ALTER") ||str.trim().toUpperCase().startsWith("DROP") || str.trim().toUpperCase().startsWith("INSERT") || str.trim().toUpperCase().startsWith("UPDATE") || str.trim().toUpperCase().startsWith("DELETE"))
+	        		{
 	        			queryIsStarted = true;
+	        			containingAtLeastOneQuery = true;
+	        		}
 	        	
 	        	if(queryIsStarted)
 	        		query += str;
@@ -265,8 +268,12 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 	        }
 	        in.close();
 	        seb.setStatus(status);
+	        if(containingAtLeastOneQuery)
+	        	seb.setFileStatus("File succesfully executed");
+	        else
+	        	seb.setFileStatus("File doesn't contain queries");
 	    } catch (IOException e) {
-			seb.setStatus("Error: File does not exists") ;
+			seb.setFileStatus("Error: File does not exists") ;
 	    	
 	    }
 	}
