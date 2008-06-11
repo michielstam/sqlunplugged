@@ -1,7 +1,18 @@
 /* CSS Document */
 
+a:link { 
+	color: #333333;
+	text-decoration: underline;
+}
+a:visited { 
+	color: #FFFFFF;
+	text-decoration: underline;
+}
+
 body
 { 
+	background-image:	url('images/gradient.png');
+	background-repeat: 	repeat-x;
 	background-color: 	#fff;
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 }
@@ -10,9 +21,8 @@ body
 {
 	position: 			absolute;
 	width: 				1000px;
+	margin:				auto;
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
-	border: 			1px solid #666666;
-	background-color: 	#ffffff;
 	color: 				#5B5B5B;
 }
 
@@ -20,8 +30,8 @@ body
 {
 	width: 				1000px;
 	height: 			50px;
-	border-bottom: 		1px solid #666666;
 	text-align:			center;
+	border-bottom:		1px solid;
 }
 
 #menu_left
@@ -32,19 +42,16 @@ body
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 	font-size: 			13px;
 	overflow: 			auto;
+	border-right:		1px solid;
 }
 
 #content
 {
 	float:				left;
 	width:	 			710px;
-	border-left:		1px solid #666666;
-	text-align: 		center;
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 	font-size: 			13px;
-	background-color:	#FFFFFF;
     padding-left:       5px;
-	text-align:			center;
 	overflow: 			auto;
 }
 
@@ -54,8 +61,54 @@ body
 	padding-top: 		5px;
 	height:				20px;
 	width: 				1000px;
-	border-top: 		1px solid #666666;
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 	font-size: 			10px;
 	text-align:			center;
+}
+
+#menu
+{
+	padding:			5px;
+}
+
+#login
+{
+	background-color: #b0dffa;
+	width: 250px;
+	margin: auto;
+	border: 1px dashed;
+}
+
+/* Copyright 2006 Joost de Valk */
+a img {
+	border: 0;
+}
+table.sortable {
+	border-spacing: 0;
+	border: 1px solid #000;
+	border-collapse: collapse;
+}
+table.sortable th, table.sortable td {
+	text-align: left;
+	padding: 2px 4px 2px 4px;
+	border-style: solid;
+	border-color: #444;
+}
+table.sortable th {
+	border-width: 0px 1px 1px 1px;
+	background-color: #e1f3fd;
+}
+table.sortable td {
+	border-width: 0px 1px 0px 1px;
+}
+table.sortable tr.odd td {
+	background-color: #fff;
+}
+table.sortable tr.even td {
+	background-color: #e1f3fd;
+}
+table.sortable tr.sortbottom td {
+	border-top: 1px solid #444;
+	background-color: #ccc;
+	font-weight: bold;
 }
