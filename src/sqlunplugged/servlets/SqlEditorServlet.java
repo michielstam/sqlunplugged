@@ -29,7 +29,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 	static final long serialVersionUID = 0L; 
 	private static long ID = 0L;
 	private SqlEditorBean seb = null;
-	String folderStore = "C:/Documents and Settings/Karel Manschot/Bureaublad/sql_editor_temp_dir";
+	String folderStore = "D:/school/blok4/sqlunplugged/sql_editor_temp_dir";
 	private static synchronized long nextID()
 	{
 		System.out.println("SqlEditorServlet.nextID");
