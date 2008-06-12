@@ -29,7 +29,10 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 	static final long serialVersionUID = 0L; 
 	private static long ID = 0L;
 	private SqlEditorBean seb = null;
-	String folderStore = "D:/school/blok4/sqlunplugged/sql_editor_temp_dir";
+	private SqlPrincipal sp = null;
+	private HttpSession session = null;
+	String rootFolder = "C:/Documents and Settings/Karel Manschot/Bureaublad/sql_editor_temp_dir";
+	File userFolder = null;
 	private static synchronized long nextID()
 	{
 		System.out.println("SqlEditorServlet.nextID");
@@ -45,78 +48,68 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 		System.out.println("(" + id + ")SqlEditorServlet.init()");
 	}
 	
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	//do get
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws  IOException, ServletException
 	{
+		//default actions
 		System.out.println("(" + id + ")SqlEditorServlet.doGet()");
-		HttpSession session = request.getSession();
-		seb = new SqlEditorBean();
-		seb.setFileStatus("");
+		session = request.getSession();
+		setSqlPrincipal(request);
+		setUserFolder();
 		
-		File folder = new File(folderStore);
-		ArrayList<String> storedFiles = new ArrayList<String>();
-		for(String file : folder.list())
-			storedFiles.add(file);
-		seb.setUploadedFiles(storedFiles);
-		seb.setFileStatus("");
-		session.setAttribute("bean", seb);
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-		dispatcher.forward(request, response);
+		//set bean
+		seb = new SqlEditorBean();
+		seb.setFileStatus("");	
+		seb.setUploadedFiles(getUserFiles());
+		
+		//set session-attribute and dispatch
+		dispatch(request, response);
 	}
 	
+	//do post
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		//default actions
 		System.out.println("(" + id + ")SqlEditorServlet.doPost()");
-		HttpSession session = request.getSession();
+		session = request.getSession();
+		setSqlPrincipal(request);
+		setUserFolder();
 		
-		
+		//logout
 		if(request.getParameter("logout") != null)
 		{
 			System.out.println("(" + id + ") Action: logout");
-			session.invalidate();
 			seb = null;
+			session.invalidate();
 			response.sendRedirect("main");
 		}
 		
+		//reset textarea
 		else if(request.getParameter("reset") != null)
 		{
 			System.out.println("(" + id + ") Action: reset");
 			seb.setQuery("");
-			session.setAttribute("bean", seb);
-			
-			File folder = new File(folderStore);
-			ArrayList<String> storedFiles = new ArrayList<String>();
-			for(String file : folder.list())
-				storedFiles.add(file);
-			seb.setUploadedFiles(storedFiles);
+			seb.setUploadedFiles(getUserFiles());
 			seb.setFileStatus("");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
 		}
 		
+		//run query
 		else if(request.getParameter("run") != null)
 		{
 			System.out.println(request.getParameter("run"));
-			seb.setStatus("");
-			SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
+			
+			String query = request.getParameter("query");
 			Connection con = sp.getConnection();
 			//query wordt uitgevoerd; returned een boolean ter controle van goede uitvoer
-			String query = request.getParameter("query");
-			try{ExecuteQuery(con, query);con.close();} 
+			try{seb.setStatus(ExecuteQuery(con, query));con.close();} 
 				catch (SQLException e){System.out.println("SQL error: " + e);seb.setStatus("Error: " + e.getMessage());}
 			
-			File folder = new File(folderStore);
-			ArrayList<String> storedFiles = new ArrayList<String>();
-			for(String file : folder.list())
-				storedFiles.add(file);
-			seb.setUploadedFiles(storedFiles);
+			seb.setUploadedFiles(getUserFiles());
 			seb.setFileStatus("");
 			seb.setQuery(query);
-			session.setAttribute("bean", seb);
-			
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
 		}
 	
+		//upload bestand
 		else if(MultipartFormDataRequest.isMultipartFormData(request))
 		{
 			MultipartFormDataRequest mrequest = null;
@@ -133,15 +126,9 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 					UploadFile file = (UploadFile) files.get("uploadfile");
 					if (file != null && file.getFileName() != null)
 					{
-						System.out.println
-						("Uploaded file: "+ file.getFileName()+
-	        			 "\nSize: "+file.getFileSize()+" bytes)"+
-	        			 "\nContent Type: "+file.getContentType()
-						);
-						
 						if(file.getContentType().equalsIgnoreCase("application/octet-stream") && file.getFileName().endsWith(".sql"))
 						{
-							try{seb.setFolderstore(folderStore);
+							try{seb.setFolderstore(userFolder.toString());
 								seb.store(mrequest, "uploadfile");}
 								catch (UploadException e){}
 							seb.setFileStatus("Upload succeeded");
@@ -155,74 +142,74 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			}
 			else seb.setFileStatus("Unexpected error encouraged");
 			
-			File folder = new File(folderStore);
-			ArrayList<String> storedFiles = new ArrayList<String>();
-			for(String file : folder.list())
-				storedFiles.add(file);
-			seb.setUploadedFiles(storedFiles);
-			session.setAttribute("bean", seb);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
+			seb.setUploadedFiles(getUserFiles());
 		}
 		
+		//delete file
 		else if(request.getParameter("delete") != null && request.getParameter("selected_file") != null)
 		{
-			File file = new File(folderStore+"/"+request.getParameter("selected_file"));
+			File file = new File(userFolder+"/"+request.getParameter("selected_file"));
 			if(file.exists())
-				file.delete();
+			{
+				file.delete();seb.setFileStatus("File "+ request.getParameter("selected_file") +" has been succesfully removed");
+			}
 			else
 				seb.setFileStatus("Cannot remove non-existing file");
 			
-			File folder = new File(folderStore);
-			ArrayList<String> storedFiles = new ArrayList<String>();
-			for(String fileName : folder.list())
-				storedFiles.add(fileName);
-			seb.setUploadedFiles(storedFiles);
-			seb.setFileStatus("File "+ request.getParameter("selected_file") +" has been succesfully removed");
+			seb.setUploadedFiles(getUserFiles());
 			seb.setQuery("");
 			seb.setStatus("");
-			session.setAttribute("bean", seb);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
 		}
 		
+		//als gebruiker een file wilt deleten zonder een file te selecteren
+		else if(request.getParameter("delete") != null && request.getParameter("selected_file") == null)
+		{
+			seb.setQueryResultData(new ArrayList<String[]>());
+			seb.setQueryResultHeaders(new ArrayList<String[]>());
+			seb.setUploadedFiles(getUserFiles());
+			seb.setFileStatus("You must select a file before delete!");
+		}	
+		
+		//execute file
 		else if(request.getParameter("execute") != null && request.getParameter("selected_file") != null)
 		{
-			String filelocation = new String(folderStore+"/"+request.getParameter("selected_file"));
-			
-			SqlPrincipal sp = (SqlPrincipal)request.getUserPrincipal();
+			String file = new String(userFolder+"/"+request.getParameter("selected_file"));
+			seb.setQuery("");
+			seb.setQueryResultData(new ArrayList<String[]>());
+			seb.setQueryResultHeaders(new ArrayList<String[]>());
 			Connection con = sp.getConnection();
-			
-			start(con, filelocation);
+			start(con, file);
 			
 			try{con.close();}
 				catch (SQLException e){seb.setStatus("Error: Failed to close the connection properly");}
 				
-			File folder = new File(folderStore);
-			ArrayList<String> storedFiles = new ArrayList<String>();
-			for(String file : folder.list())
-				storedFiles.add(file);
-			seb.setUploadedFiles(storedFiles);
-			session.setAttribute("bean", seb);
+			seb.setUploadedFiles(getUserFiles());
 			
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
 		}
 		
+		//als gebruiker een file wilt executeren zonder een file te selecteren
+		else if(request.getParameter("execute") != null && request.getParameter("selected_file") == null)
+		{
+			seb.setQueryResultData(new ArrayList<String[]>());
+			seb.setQueryResultHeaders(new ArrayList<String[]>());
+			seb.setUploadedFiles(getUserFiles());
+			seb.setFileStatus("You must select a file before execution!");
+		}		
+		
+		//ongedefinieerde actie werd uitgevoerd
 		else
 		{
 			seb = new SqlEditorBean();
 			seb.setStatus("You tried a non-existing action");
-			session.setAttribute("bean", seb);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
-			dispatcher.forward(request, response);
 		}
+		
+		if(request.getParameter("logout") == null)
+			dispatch(request, response);
 	}
 			
-		
+	//start reading and executing file
 	private void start(Connection con,String command)
 	{
-		
 		File file = new File(command);
 		
 		if(file==null)
@@ -230,6 +217,7 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			seb.setStatus("Error: File does not exists") ;
 			return;
 		}
+		
 		try 
 		{
 	        BufferedReader in = new BufferedReader(new FileReader(file.getAbsolutePath()));
@@ -249,7 +237,8 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 	        	
 	        	if(queryIsStarted)
 	        		query += str;
-	        	if(str.endsWith(";")&&queryIsStarted)
+	        	
+	        	if(str.endsWith(";") && queryIsStarted)
 	        	{
 	        		queryIsStarted = false;
 	        		status += "<hr /><br />" + query;
@@ -264,28 +253,29 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 					}
 	        		query = "";
 	        	}
-	        	
 	        }
 	        in.close();
 	        seb.setStatus(status);
 	        if(containingAtLeastOneQuery)
 	        	seb.setFileStatus("File succesfully executed");
 	        else
-	        	seb.setFileStatus("File doesn't contain queries");
+	        	seb.setFileStatus("File doesn't contain correct queries (only CREATE, ALTER, DROP, INSERT, UPDATE, DELETE are allowed).");
 	    } catch (IOException e) {
 			seb.setFileStatus("Error: File does not exists") ;
 	    	
 	    }
 	}
 			
-		
+	//destroy	
 	public void destroy()
 	{
 		System.out.println("(" + id + ")SqlEditorServlet.destroy()");
 	}
 	
+	//execute query
 	public String ExecuteQuery(Connection con, String sql) throws SQLException
 	{
+		//default actions
 		System.out.println("(" + id + ")SqlEditorServlet.getQuertResult()");
 		System.out.println(con);
 		System.out.println("SQL-query: "+sql);
@@ -312,7 +302,6 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			ResultSet resultSet = null;
 			
 			//execute query
-				
 			resultSet = query.executeQuery(sql);
 			ResultSetMetaData resultMetaData = resultSet.getMetaData();
 	        columnLength = resultMetaData.getColumnCount();
@@ -342,15 +331,18 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 	        	queryResultsData.add(data);
 	        }
 	        seb.setQueryResultData(queryResultsData);
-	        ret = queryResultsData.size()+" Items selected";
-	        resultSet.close();				
-			
+	        resultSet.close();
+	        return queryResultsData.size()+" Items selected";
 		}
 		
 		//Query anders dan SELECT
-		else
+		else if(	sql.trim().toUpperCase().startsWith("INSERT") ||
+					sql.trim().toUpperCase().startsWith("UPDATE") ||
+					sql.trim().toUpperCase().startsWith("DELETE") ||
+					sql.trim().toUpperCase().startsWith("CREATE") ||
+					sql.trim().toUpperCase().startsWith("ALTER") ||
+					sql.trim().toUpperCase().startsWith("DROP"))			
 		{
-			
 			//to do - standard message forwarden
 			int i = query.executeUpdate(sql);
 			
@@ -361,11 +353,11 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 			else if(sql.trim().toUpperCase().startsWith("CREATE") || sql.trim().toUpperCase().startsWith("ALTER") || sql.trim().toUpperCase().startsWith("DROP"))
 				ret = "Query successful executed";
 			
-			else
-				ret = "Query successful executed";
-			
+			return ret;
 		}
-		return ret;
+		
+		else
+			return "You entered a non-valid query";	
 	}
 
 	//encode htmltag, special characters
@@ -394,5 +386,41 @@ public class SqlEditorServlet extends HttpServlet implements Cloneable{
 				encodedTag.append(c);
 		}
 		return encodedTag.toString();
+	}
+	
+	//set sql-principal
+	private void setSqlPrincipal(HttpServletRequest request)
+	{
+		 sp = (SqlPrincipal)request.getUserPrincipal();
+	}
+	
+	//set userfolder
+	private void setUserFolder()
+	{
+		userFolder = new File(rootFolder+"/"+sp.getUsername());
+	}
+	
+	//get arraylist userfiles
+	private ArrayList<String> getUserFiles()
+	{
+		ArrayList<String> storedFiles = new ArrayList<String>();
+		if(userFolder.list() != null)
+		{
+			for(String file : userFolder.list())
+			{
+				if(file != null);
+				storedFiles.add(file);
+			}
+		}
+					
+		return storedFiles;
+	}
+	
+	//dispatch
+	private void dispatch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+		session.setAttribute("bean", seb);		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/SqlEditor.jsp");
+		dispatcher.forward(request, response);
 	}
 }

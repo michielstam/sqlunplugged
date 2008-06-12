@@ -10,10 +10,7 @@
 	</head>
 
 	<body>
-		<div id="container">
-			<div id="banner">
-					<h3>SQL Interpreter on the Web</h3>
-			</div>
+		<div id="container"><div id="banner"><br /><B>SQL Interpreter on the Web</B></div>
 			<div id="menu_left">
 				<div id="menu">
 					<table>
@@ -22,50 +19,56 @@
 								<img src="images/upload-server.png" />
 							</td>
 	                		<td>
-								<u>Uploaded Files:</u>
+								<h4><u>Uploaded Files:</u></h4>
 	                		</td>
 	                	</tr>
 	                </table>
 					<table>
+	                	
 	                	<c:if test="${empty bean.uploadedFiles}">
 		                	<tr>
 		                		<td width>
 	                				No files
 		                		</td>
 		                	</tr>
-		                </c:if>  
-		                	<c:forEach var="file" items="${bean.uploadedFiles}">
-		                		<form name="form0" method="post">
-								<tr>
-									<td>
-										<img src="images/file.png" width="20px" height="25px" />
-									</td>
-			                		<td width>
-			                			${file}
-			                		</td>
-			                		<td>
-			                			<input type="image" name="execute" value="Execute" src="images/execute.png" />
-										<input type="hidden" name="selected_file" value="${file}" />
-			                		</td>
-			                		<td>
-			                			<input type="image" name="delete" value="Remove" src="images/delete.png" />
-			                		</td>
-		                		</tr>
-		                		</form>
-							</c:forEach>
-	                </table>
-	                <br />
-	                <form name="form1" method="post" enctype="multipart/form-data">
-	                	<input type="file" name="uploadfile" size="15"/><input type="submit" name="upload" value="Upload"/>
-	                </form>
-	                <br />
-	                <br />
-	                	${bean.fileStatus}
-	                <br />
-	                <br />	
-				</div>
+		                </c:if>
+		                
+		                <c:if test="${!empty bean.uploadedFiles}">
+			               <form name="form5" method="post">
+			                	    <c:forEach var="file" items="${bean.uploadedFiles}">
+	                                    <tr>
+	                                        <td>
+	                                        	<input type="radio" name="selected_file" value="${file}">
+	                                        </td>
+	                                        <td>
+	                                            ${file}
+	                                        </td>
+	                                	</tr>
+	                            	</c:forEach>
+	                            <tr>
+	                            	<td></td>
+	                            	<td>
+	                            		<input type="image" name="execute" value="Execute" src="images/execute.png" /> 
+	                            		<input type="image" name="delete" value="Remove" src="images/delete.png" />
+	                           		</td>
+	                           	</tr>
+	                        </form>
+	                        </c:if>
+	                        <tr><td colspan="2"></td></tr>
+	                        <tr><td colspan="2"><b>${bean.fileStatus}</b></td></tr>
+		                
+	                 </table>
+                <br />
+                  	<form name="form1" method="post" enctype="multipart/form-data">
+              			<input type="file" name="uploadfile" size="15"/>
+                		<input type="submit" name="upload" value="Upload"/>
+                	</form>
+                <br />
+                </div>	
 			</div>
 			<div id="content">
+            	<center>
+            	<br />
 				<table>
 					<tr>
 						<td>
@@ -76,7 +79,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2">
+						<td colspan="2" align="center">
 							<form name="form2" method="post">
 								<textarea name="query" cols="40" rows="4">${bean.query}</textarea>
 								
@@ -87,12 +90,15 @@
 						</td>
 					</tr>
 				</table>
+				${bean.status}
+				<br />
 				<hr>
+				<br/>
 				<table id="results" class="sortable">	
 					<c:forEach var="item" items="${bean.queryResultHeaders}">
 						<tr>
 							<c:forEach var="i" begin="1" end="${bean.columnLength}">
-								<th>
+								<th align="center">
 									${item[i]}
 								</th>	
 							</c:forEach>
@@ -109,9 +115,12 @@
 						</tr>
 					</c:forEach>
 				</table>
+				<br />
+                </center>
         	</div>
         <div id="footnote">
         	&copy;Gemaakt door: Karel van Os, David Ammeraal, Michiel Stam en Karel Manschot
         </div>
+     </div>
 	</body>
 </html>
