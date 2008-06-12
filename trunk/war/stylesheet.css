@@ -1,37 +1,45 @@
 /* CSS Document */
 
-a:link { 
+a:link
+{ 
 	color: #333333;
 	text-decoration: underline;
 }
-a:visited { 
+a:visited
+{ 
 	color: #FFFFFF;
 	text-decoration: underline;
 }
 
 body
 { 
-	background-image:	url('images/gradient.png');
-	background-repeat: 	repeat-x;
+	background-image:   url('images/gradient.png');
+    background-repeat:  repeat-x;
 	background-color: 	#fff;
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 }
 
 #container 
 {
-	position: 			absolute;
+	position:			absolute;
+	left: 				50%;
+	margin:				0 0 0 -500px;
+	
 	width: 				1000px;
-	margin:				auto;
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
-	color: 				#5B5B5B;
+	color: 				#003366;
+	background-color:	#F1F9FE;
+	border:				1px solid #0F46A2;
 }
 
 #banner
 {
+	font-size:			24px;
 	width: 				1000px;
-	height: 			50px;
+	height: 			100px;
 	text-align:			center;
-	border-bottom:		1px solid;
+	background-image:   url('homeBanner.jpg');
+	border-bottom:		1px solid #0F46A2;
 }
 
 #menu_left
@@ -42,7 +50,11 @@ body
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 	font-size: 			13px;
 	overflow: 			auto;
-	border-right:		1px solid;
+	color:				#333333;
+	background-color: 	#DCE6FC;
+	height:				inherit;
+	border-right:		1px solid #0F46A2;
+	border-bottom:		1px solid #0F46A2;
 }
 
 #content
@@ -53,6 +65,7 @@ body
 	font-size: 			13px;
     padding-left:       5px;
 	overflow: 			auto;
+	background-color:	#F1F9FE;
 }
 
 #footnote
@@ -64,6 +77,14 @@ body
 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
 	font-size: 			10px;
 	text-align:			center;
+	background-color: 	#6195D3;
+	border-top:			1px solid #0F46A2;
+}
+
+.input
+{
+ 	font-family: 		Verdana, Arial, Helvetica, sans-serif;
+	font-size: 			13px;
 }
 
 #menu
@@ -79,7 +100,6 @@ body
 	border: 1px dashed;
 }
 
-/* Copyright 2006 Joost de Valk */
 a img {
 	border: 0;
 }

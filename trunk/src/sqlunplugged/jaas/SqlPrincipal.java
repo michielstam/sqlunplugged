@@ -84,4 +84,9 @@ public class SqlPrincipal implements Principal, Serializable
     System.out.println("SqlPrincipal.toString()");
     return username;
   }
+  
+  public String getUsername()
+  {
+	  return username;
+  }
 }
